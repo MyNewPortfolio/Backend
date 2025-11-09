@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 
 app.use(
   cors({
-    origin: ["https://swiftmartshopping.netlify.app", "http://localhost:5173"],
+    origin: ["https://biplab-biswas.netlify.app/", "http://localhost:5173"],
     credentials: true,
   })
 );
