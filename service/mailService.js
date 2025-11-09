@@ -74,7 +74,7 @@ const contact = async (req, res) => {
 
             <p style="font-size: 13px; text-align: center; color: #a0aec0;">
               This message was sent via your portfolio’s contact form.<br />
-              <a href="https://your-portfolio-link.com" target="_blank" style="color: #465697; text-decoration: none;">View Portfolio</a>
+              <a href="https://biplab-biswas.netlify.app/" target="_blank" style="color: #465697; text-decoration: none;">View Portfolio</a>
             </p>
           </div>
         </div>
