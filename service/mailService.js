@@ -4,13 +4,16 @@ const Contact = require("../models/mail");
 const contact = async (req, res) => {
   const { name, email, message } = req.body;
 
+  // 🛡️ Validate input
   if (!name || !email || !message) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
+    // 💾 Save message to DB
     await Contact.create({ name, email, message });
 
+    // 📨 Email details
     const subject = `📩 New Message from ${name}`;
     const htmlContent = `
       <div style="
@@ -63,7 +66,7 @@ const contact = async (req, res) => {
               line-height: 1.6;
               color: #2d3748;
             ">
-              ${message}
+              ${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
             </div>
 
             <p style="margin-top: 25px; font-size: 14px; color: #718096;">
@@ -81,11 +84,12 @@ const contact = async (req, res) => {
       </div>
     `;
 
+    // ✉️ Send email via Resend
     await sendEmail("bbiplab165@gmail.com", subject, htmlContent);
 
-    return res
-      .status(200)
-      .json({ message: "Message sent & stored successfully ✅" });
+    return res.status(200).json({
+      message: "✅ Message sent & stored successfully!",
+    });
   } catch (error) {
     console.error("❌ Error in contact controller:", error);
     res.status(500).json({ message: "Internal server error" });
