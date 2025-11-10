@@ -4,7 +4,7 @@ const Contact = require("../models/mail");
 const contact = async (req, res) => {
   const { name, email, message } = req.body;
 
-  // 🛡️ Validate input
+  // 🛡️ Input validation
   if (!name || !email || !message) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -13,8 +13,13 @@ const contact = async (req, res) => {
     // 💾 Save message to DB
     await Contact.create({ name, email, message });
 
-    // 📨 Email details
-    const subject = `📩 New Message from ${name}`;
+    // 🧼 Sanitize user input
+    const safeName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeEmail = email.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeMessage = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // ✉️ Email details
+    const subject = `📩 New Message from ${safeName}`;
     const htmlContent = `
       <div style="
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -48,11 +53,11 @@ const contact = async (req, res) => {
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 10px 0; font-weight: 600; color: #465697;">👤 Name</td>
-                <td style="padding: 10px 0;">${name}</td>
+                <td style="padding: 10px 0;">${safeName}</td>
               </tr>
               <tr>
                 <td style="padding: 10px 0; font-weight: 600; color: #465697;">📧 Email</td>
-                <td style="padding: 10px 0;">${email}</td>
+                <td style="padding: 10px 0;">${safeEmail}</td>
               </tr>
             </table>
 
@@ -66,7 +71,7 @@ const contact = async (req, res) => {
               line-height: 1.6;
               color: #2d3748;
             ">
-              ${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+              ${safeMessage}
             </div>
 
             <p style="margin-top: 25px; font-size: 14px; color: #718096;">
@@ -84,14 +89,20 @@ const contact = async (req, res) => {
       </div>
     `;
 
-    // ✉️ Send email via Resend
-    await sendEmail("bbiplab165@gmail.com", subject, htmlContent);
+    console.log("📤 Sending contact email to:", "bbiplab165@gmail.com");
+
+    const result = await sendEmail(
+      "bbiplab165@gmail.com",
+      subject,
+      htmlContent
+    );
+    console.log("✅ Contact email result:", result);
 
     return res.status(200).json({
       message: "✅ Message sent & stored successfully!",
     });
   } catch (error) {
-    console.error("❌ Error in contact controller:", error);
+    console.error("❌ Error in contact controller:", error.message || error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
