@@ -1,5 +1,5 @@
 const { sendEmail } = require("../config/mail");
-const Contact = require("../models/mail"); 
+const Contact = require("../models/mail");
 
 const contact = async (req, res) => {
   const { name, email, message } = req.body;
@@ -83,29 +83,32 @@ const contact = async (req, res) => {
 
     await sendEmail("bbiplab165@gmail.com", subject, htmlContent);
 
-    return res.status(200).json({ message: "Message sent & stored successfully ✅" });
+    return res
+      .status(200)
+      .json({ message: "Message sent & stored successfully ✅" });
   } catch (error) {
     console.error("❌ Error in contact controller:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-
 const notifyVisit = async (req, res) => {
   try {
     const userAgent = req.headers["user-agent"] || "Unknown device";
     const ip =
-      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
       req.socket?.remoteAddress ||
       "Unknown IP";
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 20px; border-radius: 10px;">
         <h2 style="color: #465697;">🌐 Portfolio Visited</h2>
-        <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
-        <p><strong>IP Address:</strong> ${ip}</p>
-        <p><strong>Device Info:</strong> ${userAgent}</p>
+        <p><strong>🕒 Time:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>📍 IP Address:</strong> ${ip}</p>
+        <p><strong>💻 Device Info:</strong> ${userAgent}</p>
         <p style="margin-top:10px; color:#555;">Someone just opened your portfolio!</p>
+        <hr style="margin:20px 0; border:none; border-top:1px solid #e2e8f0;" />
+        <p style="font-size:13px; color:#777;">This is an automated notification from your portfolio backend.</p>
       </div>
     `;
 
@@ -115,11 +118,14 @@ const notifyVisit = async (req, res) => {
       htmlContent
     );
 
-    return res.status(200).json({ message: "successfully ✅" });
+    return res
+      .status(200)
+      .json({ message: "Notification sent successfully ✅" });
   } catch (error) {
     console.error("❌ Error notifying visit:", error);
-    return res.status(500).json({ message: "Failed" });
+    return res
+      .status(500)
+      .json({ message: "Failed to send visit notification" });
   }
 };
-
 module.exports = { contact, notifyVisit };
